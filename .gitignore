@@ -1,0 +1,6 @@
+# Go build artifacts
+/reconstructed/gateway
+*.test
+# local analysis scratch
+*.snapshot
+*.snapshot.*

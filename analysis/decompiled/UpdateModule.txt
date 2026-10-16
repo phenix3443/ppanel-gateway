@@ -1,0 +1,173 @@
+// Ghidra 12.1.4 pseudocode via rea function, entry 0x7e67e0
+// evidence_id: ev_14e158ef7c07ba4863064a3a85a5da4966e4c2218a02357766f2739414ed4b29
+// Go function: see debug/gosym mapping in reproduce.sh
+// NOTE: Ghidra does not apply Go pclntab names; funcs show as FUN_<addr>.
+// Go calling convention makes output noisy (extraout_* regs). Pseudocode, not source.
+
+REFERENCED STRINGS: .bak, Debug, Error, Info, ������ %s ���������������������������, ������ %s ���������������������������������, ������ %s ���������������������������������������, ������ %s ������������������������������������������������������, ������������, ������������ %s ������: %s, ��������������� %s ������������������������, ������������������ %s��������������������� %s
+
+
+undefined1  [16]
+FUN_007e67e0(undefined8 *param_1,undefined8 param_2,undefined8 param_3,undefined8 param_4,
+            undefined8 param_5)
+
+{
+  undefined1 auVar1 [16];
+  undefined1 auVar2 [16];
+  char cVar3;
+  int *piVar4;
+  undefined8 extraout_RCX;
+  int iVar5;
+  char extraout_BL;
+  undefined8 extraout_RDI;
+  undefined8 extraout_R8;
+  undefined8 extraout_R11;
+  undefined8 extraout_R11_00;
+  undefined8 *extraout_R11_01;
+  undefined8 extraout_R11_02;
+  undefined8 extraout_R11_03;
+  undefined8 extraout_R11_04;
+  undefined8 extraout_R11_05;
+  undefined8 extraout_R11_06;
+  undefined8 extraout_R11_07;
+  undefined8 extraout_R11_08;
+  int unaff_R14;
+  undefined1 auVar6 [16];
+  undefined1 auVar7 [16];
+  undefined8 *puStack0000000000000008;
+  undefined8 uStack0000000000000010;
+  undefined8 uStack0000000000000018;
+  undefined8 uStack0000000000000020;
+  undefined8 uStack0000000000000028;
+  undefined8 local_a0;
+  undefined8 local_98;
+  undefined1 local_90 [16];
+  int local_80;
+  undefined8 local_78;
+  undefined8 local_70;
+  undefined8 local_68;
+  code *local_60;
+  undefined8 *local_58;
+  internal_abi_Type *local_50;
+  undefined8 uStack_48;
+  internal_abi_Type *local_40;
+  undefined8 uStack_38;
+  internal_abi_Type *local_30;
+  undefined8 uStack_28;
+  undefined8 local_20;
+  undefined8 *local_18;
+  code **local_10;
+  
+  puStack0000000000000008 = param_1;
+  uStack0000000000000018 = param_3;
+  uStack0000000000000010 = param_2;
+  uStack0000000000000028 = param_5;
+  uStack0000000000000020 = param_4;
+  while (&local_a0 <= *(undefined8 **)(unaff_R14 + 0x10)) {
+    FUN_00481a20();
+  }
+  local_18 = puStack0000000000000008 + 1;
+  FUN_0049a460();
+  local_60 = FUN_007e7280;
+  local_58 = local_18;
+  local_10 = &local_60;
+  piVar4 = (int *)FUN_0040d520(&DAT_00ba4720,*puStack0000000000000008,uStack0000000000000010,
+                               uStack0000000000000018);
+  local_80 = *piVar4;
+  if (extraout_BL == '\0') {
+    local_90._8_8_ = FUN_0041ba60(&DAT_00bae500);
+    *(undefined8 *)(local_90._8_8_ + 8) = 0x10;
+    *(undefined **)local_90._8_8_ = &DAT_00c852c6;
+    local_90._0_8_ = &PTR_error___Interface_type_00da37a0;
+    (**local_10)();
+    auVar6._8_8_ = local_90._8_8_;
+    auVar6._0_8_ = local_90._0_8_;
+    return auVar6;
+  }
+  uStack_38 = FUN_00478c80(uStack0000000000000010,uStack0000000000000018);
+  local_40 = &string___String_type;
+  uStack_28 = FUN_00478c80(uStack0000000000000020,uStack0000000000000028);
+  local_30 = &string___String_type;
+  FUN_00536080("Debug",5,s__00c82480,0xc,&DAT_00c8248c,0xc,s__s__s_00c9fefa,0x2d,extraout_R11,
+               &local_40,2,2);
+  FUN_0050e040(uStack0000000000000020,uStack0000000000000028);
+  local_70 = extraout_RDI;
+  cVar3 = FUN_00506d00(extraout_RCX,extraout_RDI,DAT_012f8c20,DAT_012f8c28);
+  if (cVar3 != '\0') {
+    uStack_48 = FUN_00478c80(uStack0000000000000020,uStack0000000000000028);
+    local_50 = &string___String_type;
+    FUN_00536080("Error",5,s__00c82480,0xc,&DAT_00c8248c,0xc,s__s_00c9e2c2,0x2b,extraout_R11_08,
+                 &local_50,1,1);
+    local_90._8_8_ = local_70;
+    local_90._0_8_ = extraout_RCX;
+    (**local_10)();
+    auVar7._8_8_ = local_90._8_8_;
+    auVar7._0_8_ = local_90._0_8_;
+    return auVar7;
+  }
+  *(undefined1 *)(local_80 + 0xf8) = 3;
+  iVar5 = local_80;
+  if (*(int *)(local_80 + 0xf0) != 0) {
+    auVar6 = FUN_007a99e0();
+    local_78 = auVar6._8_8_;
+    local_90._0_8_ = auVar6._0_8_;
+    if (local_90._0_8_ != 0) {
+      auVar6 = (**(code **)(local_90._0_8_ + 0x18))(local_78);
+      local_a0 = auVar6._8_8_;
+      local_20 = auVar6._0_8_;
+      uStack_38 = FUN_00478c80(uStack0000000000000010,uStack0000000000000018);
+      local_40 = &string___String_type;
+      uStack_28 = FUN_00478c80(local_20,local_a0);
+      local_30 = &string___String_type;
+      FUN_00536080("Error",5,s__00c82480,0xc,&DAT_00c8248c,0xc,s__s____s_00c8de26,0x1a,
+                   extraout_R11_07,&local_40,2,2);
+      local_90._8_8_ = local_78;
+      (**local_10)();
+      auVar2._8_8_ = local_90._8_8_;
+      auVar2._0_8_ = local_90._0_8_;
+      return auVar2;
+    }
+    uStack_48 = FUN_00478c80(uStack0000000000000010,uStack0000000000000018);
+    local_50 = &string___String_type;
+    FUN_00536080("Info",4,s__00c82480,0xc,&DAT_00c8248c,0xc,s__s_00c98e97,0x25,extraout_R11_00,
+                 &local_50,1,1);
+    iVar5 = local_80;
+    if (DAT_0131dbe0 != 0) {
+      FUN_00483900();
+      *extraout_R11_01 = extraout_R8;
+    }
+    *(undefined8 *)(iVar5 + 0xf0) = 0;
+  }
+  auVar6 = FUN_00461280(0,*(undefined8 *)(iVar5 + 8),*(undefined8 *)(iVar5 + 0x10),".bak",4);
+  local_68 = auVar6._0_8_;
+  auVar7 = FUN_0050a140(*(undefined8 *)(local_80 + 8),*(undefined8 *)(local_80 + 0x10),local_68,
+                        auVar6._8_8_);
+  local_98 = auVar7._8_8_;
+  iVar5 = auVar7._0_8_;
+  if (iVar5 != 0) {
+    auVar6 = (**(code **)(iVar5 + 0x18))(local_98);
+    local_a0 = auVar6._8_8_;
+    local_20 = auVar6._0_8_;
+    uStack_38 = FUN_00478c80(uStack0000000000000010,uStack0000000000000018);
+    local_40 = &string___String_type;
+    uStack_28 = FUN_00478c80(local_20,local_a0);
+    local_30 = &string___String_type;
+    FUN_00536080("Error",5,s__00c82480,0xc,&DAT_00c8248c,0xc,s__s____s_00c8de40,0x1a,extraout_R11_06
+                 ,&local_40,2,2);
+    local_90._8_8_ = local_98;
+    local_90._0_8_ = iVar5;
+    (**local_10)();
+    auVar1._8_8_ = local_90._8_8_;
+    auVar1._0_8_ = local_90._0_8_;
+    return auVar1;
+  }
+  uStack_48 = FUN_00478c80(uStack0000000000000010,uStack0000000000000018);
+  local_50 = &string___String_type;
+  FUN_00536080("Info",4,s__00c82480,0xc,&DAT_00c8248c,0xc,s__s_00ca2b0f,0x31,extraout_R11_02,
+               &local_50,1,1);
+  auVar7 = FUN_0050a140(uStack0000000000000020,uStack0000000000000028,*(undefined8 *)(local_80 + 8),
+                        *(undefined8 *)(local_80 + 0x10));
+  if (auVar7._0_8_ == 0) {
+    uStack_48 = FUN_00478c80(uStack0000000000000010,uStack0000000000000018);
+    local_50 = &string___String_type;
+    FUN_00536080("Info",4,s__00c82480,0xc,&DAT_

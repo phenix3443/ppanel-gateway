@@ -1,0 +1,12 @@
+# Discrete contract tokens recovered from `strings` on gateway-linux-amd64
+# (counts were observed during extraction; see reproduce.sh to regenerate)
+Routes (control plane):  /basic/register  /basic/heartbeat  /basic/check/version  /basic/update
+Public path classes:     /api   /sub   /admin   /
+Env vars:                GATEWAY_MODE  GATEWAY_PORT  GATEWAY_LOG_LEVEL  SECRET_KEY
+Registration fields:     service_name  proxy_path  service_url  heartbeat_url  repository  service_version  secret
+Runtime paths:           modules/ppanel-server  static/admin  static/user  etc/ppanel.yaml  version.lock
+Service names (web):     admin-web-with-api  user-web-with-api
+GitHub templates:        https://api.github.com
+                         https://github.com/%s/%s/releases/download/%s/%s
+Upstream repos referenced: https://github.com/perfect-panel/server
+                           https://github.com/perfect-panel/frontend

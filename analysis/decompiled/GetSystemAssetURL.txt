@@ -1,0 +1,49 @@
+// Ghidra 12.1.4 pseudocode via rea function, entry 0x7a1080
+// evidence_id: ev_270802b24588c042be73ee04879fbb166bb0b3d3ad722f4dc81b97bf5c735d40
+// Go function: see debug/gosym mapping in reproduce.sh
+// NOTE: Ghidra does not apply Go pclntab names; funcs show as FUN_<addr>.
+// Go calling convention makes output noisy (extraout_* regs). Pseudocode, not source.
+
+REFERENCED STRINGS: ���������������������(%s)���������
+
+
+undefined1  [32] FUN_007a1080(int param_1)
+
+{
+  undefined1 auVar1 [16];
+  int iVar2;
+  int iVar4;
+  undefined8 *puVar5;
+  undefined1 auVar3 [32];
+  int unaff_R14;
+  undefined1 auVar6 [16];
+  int iStack0000000000000008;
+  internal_abi_Type *local_18;
+  undefined8 uStack_10;
+  
+  iStack0000000000000008 = param_1;
+  while (&stack0x00000000 <= *(undefined1 **)(unaff_R14 + 0x10)) {
+    FUN_00481a20();
+  }
+  auVar6 = FUN_007a0f80();
+  puVar5 = *(undefined8 **)(iStack0000000000000008 + 0x20);
+  iVar4 = *(int *)(iStack0000000000000008 + 0x28);
+  while( true ) {
+    if (iVar4 < 1) {
+      uStack_10 = FUN_00478c80();
+      local_18 = &string___String_type;
+      auVar6 = FUN_00512520(s___s__00c96820,0x22,&local_18,1,1);
+      auVar3._24_8_ = auVar6._8_8_;
+      auVar3._0_16_ = ZEXT816(0);
+      auVar3._16_8_ = auVar6._0_8_;
+      return auVar3;
+    }
+    auVar1 = *(undefined1 (*) [16])(puVar5 + 2);
+    iVar2 = FUN_0040ebc0(*puVar5,puVar5[1],auVar6._0_8_,auVar6._8_8_);
+    if (-1 < iVar2) break;
+    puVar5 = puVar5 + 4;
+    iVar4 = iVar4 + -1;
+  }
+  return ZEXT1632(auVar1);
+}
+

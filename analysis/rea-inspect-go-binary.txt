@@ -1,0 +1,117 @@
+evidence_id: ev_c84ad84413b53c9a45404c45592f605d5df99841cca3ccce1f1b17ca233f6cbf
+subject:
+  name: gateway-linux-amd64
+  digest:
+    sha256: 7a990413e51af7a332ea9a640486682205ec2e98ab4a5581816142e8ee6a4322
+  local_path: /home/lsl/gihtub/phenix3443/ppanel/ppanel/bin/gateway-linux-amd64
+  format: elf
+  architecture: x86_64
+provider:
+  id: go-build-info
+  name: REA Go build-information reader
+  version: "1"
+analysis_profile: null
+predicate_type: rea.analysis
+operation: inspect_go_binary
+parameters:
+  path: /home/lsl/gihtub/phenix3443/ppanel/ppanel/bin/gateway-linux-amd64
+raw_result: null
+normalized_result:
+  artifact:
+    path: /home/lsl/gihtub/phenix3443/ppanel/ppanel/bin/gateway-linux-amd64
+    sha256: 7a990413e51af7a332ea9a640486682205ec2e98ab4a5581816142e8ee6a4322
+    bytes: 15696164
+  format: elf
+  architecture: amd64
+  bits: 64
+  byte_order: little
+  build_info:
+    header_offset: 15196160
+    encoding: inline
+    go_version: go1.24.11
+    go_version_bytes_base64: Z28xLjI0LjEx
+    module_text: "path\tcommand-line-arguments\ndep\tgithub.com/beorn7/perks\tv1.0.1\th1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=\ndep\tgithub.com/cenkalti/backoff/v4\tv4.3.0\th1:MyRJ/UdXutAwSAT+s3wNd7MfTIcy71VQueUuFK343L8=\ndep\tgithub.com/cespare/xxhash/v2\tv2.3.0\th1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UFvs=\ndep\tgithub.com/fatih/color\tv1.18.0\th1:S8gINlzdQ840/4pfAwic/ZE0djQEH3wM94VfqLTZcOM=\ndep\tgithub.com/go-chi/chi/v5\tv5.2.3\th1:WQIt9uxdsAbgIYgid+BpYc+liqQZGMHRaUwp0JUcvdE=\ndep\tgithub.com/go-logr/logr\tv1.4.2\th1:6pFjapn8bFcIbiKo3XT4j/BhANplGihG6tvd+8rYgrY=\ndep\tgithub.com/go-logr/stdr\tv1.2.2\th1:hSWxHoqTgW2S2qGc0LTAI563KZ5YKYRhT3MFKZMbjag=\ndep\tgithub.com/go-resty/resty/v2\tv2.16.5\th1:hBKqmWrr7uRc3euHVqmh1HTHcKn99Smr7o5spptdhTM=\ndep\tgithub.com/grafana/pyroscope-go\tv1.2.7\th1:VWBBlqxjyR0Cwk2W6UrE8CdcdD80GOFNutj0Kb1T8ac=\ndep\tgithub.com/grafana/pyroscope-go/godeltaprof\tv0.1.9\th1:c1Us8i6eSmkW+Ez05d3co8kasnuOY813tbMN8i/a3Og=\ndep\tgithub.com/grpc-ecosystem/grpc-gateway/v2\tv2.20.0\th1:bkypFPDjIYGfCYD5mRBvpqxfYX1YCS1PXdKYWi8FsN0=\ndep\tgithub.com/klauspost/compress\tv1.17.11\th1:In6xLpyWOi1+C7tXUUWv2ot1QvBjxevKAaI6IXrJmUc=\ndep\tgithub.com/mattn/go-colorable\tv0.1.13\th1:fFA4WZxdEF4tXPZVKMLwD8oUnCTTo08duU7wxecdEvA=\ndep\tgithub.com/mattn/go-isatty\tv0.0.20\th1:xfD0iDuEKnDkl03q4limB+vH+GxLEtL/jb4xVJSWWEY=\ndep\tgithub.com/munnerz/goautoneg\tv0.0.0-20191010083416-a7dc8b61c822\th1:C3w9PqII01/Oq1c1nUAm88MOHcQC9l5mIlSMApZMrHA=\ndep\tgithub.com/openzipkin/zipkin-go\tv0.4.3\th1:9EGwpqkgnwdEIJ+Od7QVSEIH+ocmm5nPat0G7sjsSdg=\ndep\tgithub.com/pelletier/go-toml/v2\tv2.2.2\th1:aYUidT7k73Pcl9nb2gScu7NSrKCSHIDE89b3+6Wq+LM=\ndep\tgithub.com/prometheus/client_golang\tv1.21.1\th1:DOvXXTqVzvkIewV/CDPFdejpMCGeMcbGCQ8YOmu+Ibk=\ndep\tgithub.com/prometheus/client_model\tv0.6.1\th1:ZKSh/rekM+n3CeS952MLRAdFwIKqeY8b62p8ais2e9E=\ndep\tgithub.com/prometheus/common\tv0.62.0\th1:xasJaQlnWAeyHdUBeGjXmutelfJHWMRr+Fg4QszZ2Io=\ndep\tgithub.com/prometheus/procfs\tv0.15.1\th1:YagwOFzUgYfKKHX6Dr+sHT7km/hxC76UB0learggepc=\ndep\tgithub.com/spaolacci/murmur3\tv1.1.0\th1:7c1g84S4BPRrfL5Xrdp6fOJ206sU9y293DDHaoy0bLI=\ndep\tgithub.com/zeromicro/go-zero\tv1.9.2\th1:ZXOXBIcazZ1pWAMiHyVnDQ3Sxwy7DYPzjE89Qtj9vqM=\ndep\tgithub.com/zeromicro/x\tv0.0.0-20240408115609-8224c482b07e\th1:F5waakzloTfbJg2lcO1xvrzO6ssn7jQ38lXIDBz+nbQ=\ndep\tgo.opentelemetry.io/otel\tv1.24.0\th1:0LAOdjNmQeSTzGBzduGe/rU4tZhMwL5rWgtp9Ku5Jfo=\ndep\tgo.opentelemetry.io/otel/exporters/jaeger\tv1.17.0\th1:D7UpUy2Xc2wsi1Ras6V40q806WM07rqoCWzXu7Sqy+4=\ndep\tgo.opentelemetry.io/otel/exporters/otlp/otlptrace\tv1.24.0\th1:t6wl9SPayj+c7lEIFgm4ooDBZVb01IhLB4InpomhRw8=\ndep\tgo.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc\tv1.24.0\th1:Mw5xcxMwlqoJd97vwPxA8isEaIoxsta9/Q51+TTJLGE=\ndep\tgo.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp\tv1.24.0\th1:Xw8U6u2f8DK2XAkGRFV7BBLENgnTGX9i4rQRxJf+/vs=\ndep\tgo.opentelemetry.io/otel/exporters/stdout/stdouttrace\tv1.24.0\th1:s0PHtIkN+3xrbDOpt2M8OTG92cWqUESvzh2MxiR5xY8=\ndep\tgo.opentelemetry.io/otel/exporters/zipkin\tv1.24.0\th1:3evrL5poBuh1KF51D9gO/S+N/1msnm4DaBqs/rpXUqY=\ndep\tgo.opentelemetry.io/otel/metric\tv1.24.0\th1:6EhoGWWK28x1fbpA4tYTOWBkPefTDQnb8WSGXlc88kI=\ndep\tgo.opentelemetry.io/otel/sdk\tv1.24.0\th1:YMPPDNymmQN3ZgczicBY3B6sf9n62Dlj9pWD3ucgoDw=\ndep\tgo.opentelemetry.io/otel/trace\tv1.24.0\th1:CsKnnL4dUAr/0llH9FKuc698G04IrpWV0MQA/Y1YELI=\ndep\tgo.opentelemetry.io/proto/otlp\tv1.3.1\th1:TrMUixzpM0yuc/znrFTP9MMRh8trP93mkCiDVeXrui0=\ndep\tgo.uber.org/automaxprocs\tv1.6.0\th1:O3y2/QNTOdbF+e/dpXNNW7Rx2hZ4sTIPyybbxyNqTUs=\ndep\tgolang.org/x/net\tv0.35.0\th1:T5GQRQb2y08kTAByq9L4/bz8cipCdA8FbRTXewonqY8=\ndep\tgolang.org/x/sys\tv0.30.0\th1:QjkSwP/36a20jFYWkSue1YwXzLmsV5Gfq7Eiy72C1uc=\ndep\tgolang.org/x/text\tv0.22.0\th1:bofq7m3/HAFvbF51jz3Q9wLg3jkvSPuiZu/pD1XwgtM=\ndep\tgoogle.golang.org/genproto/googleapis/api\tv0.0.0-20240711142825-46eb208f015d\th1:kHjw/5UfflP/L5EbledDrcG4C2597RtymmGRZvHiCuY=\ndep\tgoogle.golang.org/genproto/googleapis/rpc\tv0.0.0-20240701130421-f6361c86f094\th1:BwIjyKYGsK9dMCBOorzRri8MQwmi7mT9rGHsCEinZkA=\ndep\tgoogle.golang.org/grpc\tv1.65.0\th1:bs/cUb4lp1G5iImFFd3u5ixQzweKizoZJAwBNLR42lc=\ndep\tgoogle.golang.org/protobuf\tv1.36.5\th1:tPhr+woSbjfYvY6/GPufUoYizxw1cF/yFoxJ2fmpwlM=\ndep\tgopkg.in/yaml.v2\tv2.4.0\th1:D8xgwECY7CYvx+Y2n4sBz93Jn9JRvxdiyyo8CTfuKaY=\ndep\tupdater\t(devel)\t\nbuild\t-buildmode=exe\nbuild\t-compiler=gc\nbuild\t-ldflags=\"-s -w\"\nbuild\tCGO_ENABLED=1\nbuild\tCGO_CFLAGS=\nbuild\tCGO_CPPFLAGS=\nbuild\tCGO_CXXFLAGS=\nbuild\tCGO_LDFLAGS=\nbuild\tGOARCH=amd64\nbuild\tGOOS=linux\nbuild\tGOAMD64=v1\n"
+    module_bytes_base64: MHevDJJ0CAJB4cEH5tYY5nBhdGgJY29tbWFuZC1saW5lLWFyZ3VtZW50cwpkZXAJZ2l0aHViLmNvbS9iZW9ybjcvcGVya3MJdjEuMC4xCWgxOlZsYktLbk5mVjhiSnplcW9hNGNPS3FPNmJZcjNXZ0taeE84WjE2K2hzT009CmRlcAlnaXRodWIuY29tL2NlbmthbHRpL2JhY2tvZmYvdjQJdjQuMy4wCWgxOk15UkovVWRYdXRBd1NBVCtzM3dOZDdNZlRJY3k3MVZRdWVVdUZLMzQzTDg9CmRlcAlnaXRodWIuY29tL2Nlc3BhcmUveHhoYXNoL3YyCXYyLjMuMAloMTpVTDgxNXhVOVNxc0ZsaWJ6dWdnempYaG9nN2JMNm9YOUJiTlpuTDJVRnZzPQpkZXAJZ2l0aHViLmNvbS9mYXRpaC9jb2xvcgl2MS4xOC4wCWgxOlM4Z0lObHpkUTg0MC80cGZBd2ljL1pFMGRqUUVIM3dNOTRWZnFMVFpjT009CmRlcAlnaXRodWIuY29tL2dvLWNoaS9jaGkvdjUJdjUuMi4zCWgxOldRSXQ5dXhkc0FiZ0lZZ2lkK0JwWWMrbGlxUVpHTUhSYVV3cDBKVWN2ZEU9CmRlcAlnaXRodWIuY29tL2dvLWxvZ3IvbG9ncgl2MS40LjIJaDE6NnBGamFwbjhiRmNJYmlLbzNYVDRqL0JoQU5wbEdpaEc2dHZkKzhyWWdyWT0KZGVwCWdpdGh1Yi5jb20vZ28tbG9nci9zdGRyCXYxLjIuMgloMTpoU1d4SG9xVGdXMlMycUdjMExUQUk1NjNLWjVZS1lSaFQzTUZLWk1iamFnPQpkZXAJZ2l0aHViLmNvbS9nby1yZXN0eS9yZXN0eS92Mgl2Mi4xNi41CWgxOmhCS3FtV3JyN3VSYzNldUhWcW1oMUhUSGNLbjk5U21yN281c3BwdGRoVE09CmRlcAlnaXRodWIuY29tL2dyYWZhbmEvcHlyb3Njb3BlLWdvCXYxLjIuNwloMTpWV0JCbHF4anlSMEN3azJXNlVyRThDZGNkRDgwR09GTnV0ajBLYjFUOGFjPQpkZXAJZ2l0aHViLmNvbS9ncmFmYW5hL3B5cm9zY29wZS1nby9nb2RlbHRhcHJvZgl2MC4xLjkJaDE6YzFVczhpNmVTbWtXK0V6MDVkM2NvOGthc251T1k4MTN0Yk1OOGkvYTNPZz0KZGVwCWdpdGh1Yi5jb20vZ3JwYy1lY29zeXN0ZW0vZ3JwYy1nYXRld2F5L3YyCXYyLjIwLjAJaDE6Ymt5cEZQRGpJWUdmQ1lENW1SQnZwcXhmWVgxWUNTMVBYZEtZV2k4RnNOMD0KZGVwCWdpdGh1Yi5jb20va2xhdXNwb3N0L2NvbXByZXNzCXYxLjE3LjExCWgxOkluNnhMcHlXT2kxK0M3dFhVVVd2Mm90MVF2Qmp4ZXZLQWFJNklYckptVWM9CmRlcAlnaXRodWIuY29tL21hdHRuL2dvLWNvbG9yYWJsZQl2MC4xLjEzCWgxOmZGQTRXWnhkRUY0dFhQWlZLTUx3RDhvVW5DVFRvMDhkdVU3d3hlY2RFdkE9CmRlcAlnaXRodWIuY29tL21hdHRuL2dvLWlzYXR0eQl2MC4wLjIwCWgxOnhmRDBpRHVFS25Ea2wwM3E0bGltQit2SCtHeExFdEwvamI0eFZKU1dXRVk9CmRlcAlnaXRodWIuY29tL211bm5lcnovZ29hdXRvbmVnCXYwLjAuMC0yMDE5MTAxMDA4MzQxNi1hN2RjOGI2MWM4MjIJaDE6QzN3OVBxSUkwMS9PcTFjMW5VQW04OE1PSGNRQzlsNW1JbFNNQXBaTXJIQT0KZGVwCWdpdGh1Yi5jb20vb3BlbnppcGtpbi96aXBraW4tZ28JdjAuNC4zCWgxOjlFR3dwcWtnbndkRUlKK09kN1FWU0VJSCtvY21tNW5QYXQwRzdzanNTZGc9CmRlcAlnaXRodWIuY29tL3BlbGxldGllci9nby10b21sL3YyCXYyLjIuMgloMTphWVVpZFQ3azczUGNsOW5iMmdTY3U3TlNyS0NTSElERTg5YjMrNldxK0xNPQpkZXAJZ2l0aHViLmNvbS9wcm9tZXRoZXVzL2NsaWVudF9nb2xhbmcJdjEuMjEuMQloMTpET3ZYWFRxVnp2a0lld1YvQ0RQRmRlanBNQ0dlTWNiR0NROFlPbXUrSWJrPQpkZXAJZ2l0aHViLmNvbS9wcm9tZXRoZXVzL2NsaWVudF9tb2RlbAl2MC42LjEJaDE6WktTaC9yZWtNK24zQ2VTOTUyTUxSQWRGd0lLcWVZOGI2MnA4YWlzMmU5RT0KZGVwCWdpdGh1Yi5jb20vcHJvbWV0aGV1cy9jb21tb24JdjAuNjIuMAloMTp4YXNKYVFsbldBZXlIZFVCZUdqWG11dGVsZkpIV01ScitGZzRRc3paMklvPQpkZXAJZ2l0aHViLmNvbS9wcm9tZXRoZXVzL3Byb2Nmcwl2MC4xNS4xCWgxOllhZ3dPRnpVZ1lmS0tIWDZEcitzSFQ3a20vaHhDNzZVQjBsZWFyZ2dlcGM9CmRlcAlnaXRodWIuY29tL3NwYW9sYWNjaS9tdXJtdXIzCXYxLjEuMAloMTo3YzFnODRTNEJQUnJmTDVYcmRwNmZPSjIwNnNVOXkyOTNEREhhb3kwYkxJPQpkZXAJZ2l0aHViLmNvbS96ZXJvbWljcm8vZ28temVybwl2MS45LjIJaDE6WlhPWEJJY2F6WjFwV0FNaUh5Vm5EUTNTeHd5N0RZUHpqRTg5UXRqOXZxTT0KZGVwCWdpdGh1Yi5jb20vemVyb21pY3JvL3gJdjAuMC4wLTIwMjQwNDA4MTE1NjA5LTgyMjRjNDgyYjA3ZQloMTpGNXdhYWt6bG9UZmJKZzJsY08xeHZyek82c3NuN2pRMzhsWElEQnorbmJRPQpkZXAJZ28ub3BlbnRlbGVtZXRyeS5pby9vdGVsCXYxLjI0LjAJaDE6MExBT2RqTm1RZVNUekdCemR1R2UvclU0dFpoTXdMNXJXZ3RwOUt1NUpmbz0KZGVwCWdvLm9wZW50ZWxlbWV0cnkuaW8vb3RlbC9leHBvcnRlcnMvamFlZ2VyCXYxLjE3LjAJaDE6RDdVcFV5MlhjMndzaTFSYXM2VjQwcTgwNldNMDdycW9DV3pYdTdTcXkrND0KZGVwCWdvLm9wZW50ZWxlbWV0cnkuaW8vb3RlbC9leHBvcnRlcnMvb3RscC9vdGxwdHJhY2UJdjEuMjQuMAloMTp0NndsOVNQYXlqK2M3bEVJRmdtNG9vREJaVmIwMUloTEI0SW5wb21oUnc4PQpkZXAJZ28ub3BlbnRlbGVtZXRyeS5pby9vdGVsL2V4cG9ydGVycy9vdGxwL290bHB0cmFjZS9vdGxwdHJhY2VncnBjCXYxLjI0LjAJaDE6TXc1eGN4TXdscW9KZDk3dndQeEE4aXNFYUlveHN0YTkvUTUxK1RUSkxHRT0KZGVwCWdvLm9wZW50ZWxlbWV0cnkuaW8vb3RlbC9leHBvcnRlcnMvb3RscC9vdGxwdHJhY2Uvb3RscHRyYWNlaHR0cAl2MS4yNC4wCWgxOlh3OFU2dTJmOERLMlhBa0dSRlY3QkJMRU5nblRHWDlpNHJRUnhKZisvdnM9CmRlcAlnby5vcGVudGVsZW1ldHJ5LmlvL290ZWwvZXhwb3J0ZXJzL3N0ZG91dC9zdGRvdXR0cmFjZQl2MS4yNC4wCWgxOnMwUEh0SWtOKzN4cmJET3B0Mk04T1RHOTJjV3FVRVN2emgyTXhpUjV4WTg9CmRlcAlnby5vcGVudGVsZW1ldHJ5LmlvL290ZWwvZXhwb3J0ZXJzL3ppcGtpbgl2MS4yNC4wCWgxOjNldnJMNXBvQnVoMUtGNTFEOWdPL1MrTi8xbXNubTREYUJxcy9ycFhVcVk9CmRlcAlnby5vcGVudGVsZW1ldHJ5LmlvL290ZWwvbWV0cmljCXYxLjI0LjAJaDE6NkVob0dXV0syOHgxZmJwQTR0WVRPV0JrUGVmVERRbmI4V1NHWGxjODhrST0KZGVwCWdvLm9wZW50ZWxlbWV0cnkuaW8vb3RlbC9zZGsJdjEuMjQuMAloMTpZTVBQRE55bW1RTjNaZ2N6aWNCWTNCNnNmOW42MkRsajlwV0QzdWNnb0R3PQpkZXAJZ28ub3BlbnRlbGVtZXRyeS5pby9vdGVsL3RyYWNlCXYxLjI0LjAJaDE6Q3NLbm5MNGRVQXIvMGxsSDlGS3VjNjk4RzA0SXJwV1YwTVFBL1kxWUVMST0KZGVwCWdvLm9wZW50ZWxlbWV0cnkuaW8vcHJvdG8vb3RscAl2MS4zLjEJaDE6VHJNVWl4enBNMHl1Yy96bnJGVFA5TU1SaDh0clA5M21rQ2lEVmVYcnVpMD0KZGVwCWdvLnViZXIub3JnL2F1dG9tYXhwcm9jcwl2MS42LjAJaDE6TzN5Mi9RTlRPZGJGK2UvZHBYTk5XN1J4MmhaNHNUSVB5eWJieHlOcVRVcz0KZGVwCWdvbGFuZy5vcmcveC9uZXQJdjAuMzUuMAloMTpUNUdRUlFiMnkwOGtUQUJ5cTlMNC9iejhjaXBDZEE4RmJSVFhld29ucVk4PQpkZXAJZ29sYW5nLm9yZy94L3N5cwl2MC4zMC4wCWgxOlFqa1N3UC8zNmEyMGpGWVdrU3VlMVl3WHpMbXNWNUdmcTdFaXk3MkMxdWM9CmRlcAlnb2xhbmcub3JnL3gvdGV4dAl2MC4yMi4wCWgxOmJvZnE3bTMvSEFGdmJGNTFqejNROXdMZzNqa3ZTUHVpWnUvcEQxWHdndE09CmRlcAlnb29nbGUuZ29sYW5nLm9yZy9nZW5wcm90by9nb29nbGVhcGlzL2FwaQl2MC4wLjAtMjAyNDA3MTExNDI4MjUtNDZlYjIwOGYwMTVkCWgxOmtIancvNVVmZmxQL0w1RWJsZWREcmNHNEMyNTk3UnR5bW1HUlp2SGlDdVk9CmRlcAlnb29nbGUuZ29sYW5nLm9yZy9nZW5wcm90by9nb29nbGVhcGlzL3JwYwl2MC4wLjAtMjAyNDA3MDExMzA0MjEtZjYzNjFjODZmMDk0CWgxOkJ3SWp5S1lHc0s5ZE1DQk9vcnpScmk4TVF3bWk3bVQ5ckdIc0NFaW5aa0E9CmRlcAlnb29nbGUuZ29sYW5nLm9yZy9ncnBjCXYxLjY1LjAJaDE6YnMvY1ViNGxwMUc1aUltRkZkM3U1aXhRendlS2l6b1pKQXdCTkxSNDJsYz0KZGVwCWdvb2dsZS5nb2xhbmcub3JnL3Byb3RvYnVmCXYxLjM2LjUJaDE6dFBocit3b1NiamZZdlk2L0dQdWZVb1lpenh3MWNGL3lGb3hKMmZtcHdsTT0KZGVwCWdvcGtnLmluL3lhbWwudjIJdjIuNC4wCWgxOkQ4eGd3RUNZN0NZdngrWTJuNHNCejkzSm45SlJ2eGRpeXlvOENUZnVLYVk9CmRlcAl1cGRhdGVyCShkZXZlbCkJCmJ1aWxkCS1idWlsZG1vZGU9ZXhlCmJ1aWxkCS1jb21waWxlcj1nYwpidWlsZAktbGRmbGFncz0iLXMgLXciCmJ1aWxkCUNHT19FTkFCTEVEPTEKYnVpbGQJQ0dPX0NGTEFHUz0KYnVpbGQJQ0dPX0NQUEZMQUdTPQpidWlsZAlDR09fQ1hYRkxBR1M9CmJ1aWxkCUNHT19MREZMQUdTPQpidWlsZAlHT0FSQ0g9YW1kNjQKYnVpbGQJR09PUz1saW51eApidWlsZAlHT0FNRDY0PXYxCvkyQzGGGCByAIJCEEEW2PI=
+    version_location:
+      offset: 15196193
+      bytes: 9
+    module_location:
+      offset: 15196204
+      bytes: 4436
+    module:
+      path: command-line-arguments
+      main: null
+      dependencies[45]{path,version,sum,replacement}:
+        github.com/beorn7/perks,v1.0.1,"h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=",null
+        github.com/cenkalti/backoff/v4,v4.3.0,"h1:MyRJ/UdXutAwSAT+s3wNd7MfTIcy71VQueUuFK343L8=",null
+        github.com/cespare/xxhash/v2,v2.3.0,"h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UFvs=",null
+        github.com/fatih/color,v1.18.0,"h1:S8gINlzdQ840/4pfAwic/ZE0djQEH3wM94VfqLTZcOM=",null
+        github.com/go-chi/chi/v5,v5.2.3,"h1:WQIt9uxdsAbgIYgid+BpYc+liqQZGMHRaUwp0JUcvdE=",null
+        github.com/go-logr/logr,v1.4.2,"h1:6pFjapn8bFcIbiKo3XT4j/BhANplGihG6tvd+8rYgrY=",null
+        github.com/go-logr/stdr,v1.2.2,"h1:hSWxHoqTgW2S2qGc0LTAI563KZ5YKYRhT3MFKZMbjag=",null
+        github.com/go-resty/resty/v2,v2.16.5,"h1:hBKqmWrr7uRc3euHVqmh1HTHcKn99Smr7o5spptdhTM=",null
+        github.com/grafana/pyroscope-go,v1.2.7,"h1:VWBBlqxjyR0Cwk2W6UrE8CdcdD80GOFNutj0Kb1T8ac=",null
+        github.com/grafana/pyroscope-go/godeltaprof,v0.1.9,"h1:c1Us8i6eSmkW+Ez05d3co8kasnuOY813tbMN8i/a3Og=",null
+        github.com/grpc-ecosystem/grpc-gateway/v2,v2.20.0,"h1:bkypFPDjIYGfCYD5mRBvpqxfYX1YCS1PXdKYWi8FsN0=",null
+        github.com/klauspost/compress,v1.17.11,"h1:In6xLpyWOi1+C7tXUUWv2ot1QvBjxevKAaI6IXrJmUc=",null
+        github.com/mattn/go-colorable,v0.1.13,"h1:fFA4WZxdEF4tXPZVKMLwD8oUnCTTo08duU7wxecdEvA=",null
+        github.com/mattn/go-isatty,v0.0.20,"h1:xfD0iDuEKnDkl03q4limB+vH+GxLEtL/jb4xVJSWWEY=",null
+        github.com/munnerz/goautoneg,v0.0.0-20191010083416-a7dc8b61c822,"h1:C3w9PqII01/Oq1c1nUAm88MOHcQC9l5mIlSMApZMrHA=",null
+        github.com/openzipkin/zipkin-go,v0.4.3,"h1:9EGwpqkgnwdEIJ+Od7QVSEIH+ocmm5nPat0G7sjsSdg=",null
+        github.com/pelletier/go-toml/v2,v2.2.2,"h1:aYUidT7k73Pcl9nb2gScu7NSrKCSHIDE89b3+6Wq+LM=",null
+        github.com/prometheus/client_golang,v1.21.1,"h1:DOvXXTqVzvkIewV/CDPFdejpMCGeMcbGCQ8YOmu+Ibk=",null
+        github.com/prometheus/client_model,v0.6.1,"h1:ZKSh/rekM+n3CeS952MLRAdFwIKqeY8b62p8ais2e9E=",null
+        github.com/prometheus/common,v0.62.0,"h1:xasJaQlnWAeyHdUBeGjXmutelfJHWMRr+Fg4QszZ2Io=",null
+        github.com/prometheus/procfs,v0.15.1,"h1:YagwOFzUgYfKKHX6Dr+sHT7km/hxC76UB0learggepc=",null
+        github.com/spaolacci/murmur3,v1.1.0,"h1:7c1g84S4BPRrfL5Xrdp6fOJ206sU9y293DDHaoy0bLI=",null
+        github.com/zeromicro/go-zero,v1.9.2,"h1:ZXOXBIcazZ1pWAMiHyVnDQ3Sxwy7DYPzjE89Qtj9vqM=",null
+        github.com/zeromicro/x,v0.0.0-20240408115609-8224c482b07e,"h1:F5waakzloTfbJg2lcO1xvrzO6ssn7jQ38lXIDBz+nbQ=",null
+        go.opentelemetry.io/otel,v1.24.0,"h1:0LAOdjNmQeSTzGBzduGe/rU4tZhMwL5rWgtp9Ku5Jfo=",null
+        go.opentelemetry.io/otel/exporters/jaeger,v1.17.0,"h1:D7UpUy2Xc2wsi1Ras6V40q806WM07rqoCWzXu7Sqy+4=",null
+        go.opentelemetry.io/otel/exporters/otlp/otlptrace,v1.24.0,"h1:t6wl9SPayj+c7lEIFgm4ooDBZVb01IhLB4InpomhRw8=",null
+        go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc,v1.24.0,"h1:Mw5xcxMwlqoJd97vwPxA8isEaIoxsta9/Q51+TTJLGE=",null
+        go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp,v1.24.0,"h1:Xw8U6u2f8DK2XAkGRFV7BBLENgnTGX9i4rQRxJf+/vs=",null
+        go.opentelemetry.io/otel/exporters/stdout/stdouttrace,v1.24.0,"h1:s0PHtIkN+3xrbDOpt2M8OTG92cWqUESvzh2MxiR5xY8=",null
+        go.opentelemetry.io/otel/exporters/zipkin,v1.24.0,"h1:3evrL5poBuh1KF51D9gO/S+N/1msnm4DaBqs/rpXUqY=",null
+        go.opentelemetry.io/otel/metric,v1.24.0,"h1:6EhoGWWK28x1fbpA4tYTOWBkPefTDQnb8WSGXlc88kI=",null
+        go.opentelemetry.io/otel/sdk,v1.24.0,"h1:YMPPDNymmQN3ZgczicBY3B6sf9n62Dlj9pWD3ucgoDw=",null
+        go.opentelemetry.io/otel/trace,v1.24.0,"h1:CsKnnL4dUAr/0llH9FKuc698G04IrpWV0MQA/Y1YELI=",null
+        go.opentelemetry.io/proto/otlp,v1.3.1,"h1:TrMUixzpM0yuc/znrFTP9MMRh8trP93mkCiDVeXrui0=",null
+        go.uber.org/automaxprocs,v1.6.0,"h1:O3y2/QNTOdbF+e/dpXNNW7Rx2hZ4sTIPyybbxyNqTUs=",null
+        golang.org/x/net,v0.35.0,"h1:T5GQRQb2y08kTAByq9L4/bz8cipCdA8FbRTXewonqY8=",null
+        golang.org/x/sys,v0.30.0,"h1:QjkSwP/36a20jFYWkSue1YwXzLmsV5Gfq7Eiy72C1uc=",null
+        golang.org/x/text,v0.22.0,"h1:bofq7m3/HAFvbF51jz3Q9wLg3jkvSPuiZu/pD1XwgtM=",null
+        google.golang.org/genproto/googleapis/api,v0.0.0-20240711142825-46eb208f015d,"h1:kHjw/5UfflP/L5EbledDrcG4C2597RtymmGRZvHiCuY=",null
+        google.golang.org/genproto/googleapis/rpc,v0.0.0-20240701130421-f6361c86f094,"h1:BwIjyKYGsK9dMCBOorzRri8MQwmi7mT9rGHsCEinZkA=",null
+        google.golang.org/grpc,v1.65.0,"h1:bs/cUb4lp1G5iImFFd3u5ixQzweKizoZJAwBNLR42lc=",null
+        google.golang.org/protobuf,v1.36.5,"h1:tPhr+woSbjfYvY6/GPufUoYizxw1cF/yFoxJ2fmpwlM=",null
+        gopkg.in/yaml.v2,v2.4.0,"h1:D8xgwECY7CYvx+Y2n4sBz93Jn9JRvxdiyyo8CTfuKaY=",null
+        updater,(devel),"",null
+      settings[11]{key,value}:
+        "-buildmode",exe
+        "-compiler",gc
+        "-ldflags","-s -w"
+        CGO_ENABLED,"1"
+        CGO_CFLAGS,""
+        CGO_CPPFLAGS,""
+        CGO_CXXFLAGS,""
+        CGO_LDFLAGS,""
+        GOARCH,amd64
+        GOOS,linux
+        GOAMD64,v1
+      unparsed_lines: []
+      unparsed_line_bytes_base64: []
+      complete: true
+  limitations[3]: "Embedded build metadata is observed file content, not proof of compiler identity, dependency authenticity or runtime behavior.","Only Go build information is inspected; function names, source mappings, type metadata and decompiled code are not recovered.","Resource guards bound stable artifact reads and cumulative header searches to 256 MiB each, aggregate embedded strings to 1 MiB, structural table decoding to 16 MiB and complete metadata payloads to 8 MiB; these are not operating-system memory or CPU limits."
+confidence: observed
+authority: shipped-artifact
+environment: null
+limitations[3]: "Embedded build metadata is observed file content, not proof of compiler identity, dependency authenticity or runtime behavior.","Only Go build information is inspected; function names, source mappings, type metadata and decompiled code are not recovered.","Resource guards bound stable artifact reads and cumulative header searches to 256 MiB each, aggregate embedded strings to 1 MiB, structural table decoding to 16 MiB and complete metadata payloads to 8 MiB; these are not operating-system memory or CPU limits."
+relationship_coverage: null
+locations[2]:
+  - kind: artifact-path
+    path: /home/lsl/gihtub/phenix3443/ppanel/ppanel/bin/gateway-linux-amd64
+  - kind: file-offset-range
+    start: 15196160
+    end: 15196192
+evidence_links: []
