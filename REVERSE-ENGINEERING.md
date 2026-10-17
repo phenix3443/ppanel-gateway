@@ -175,7 +175,7 @@ pclntab-aware function listing, then disassemble the named functions.
 
 ## Relationship to the build plan
 
-`../../obsidian/ppanel/engineering-log/gateway-build-plan.md` proposes a
+A separate, private build plan proposes a
 *greenfield* redesign (`internal/httpapi`, `internal/proxy`, …). This report and
 `reconstructed/` instead mirror the **actual binary's** `updater/*` layout, so
 the two are complementary: the build plan is the intended rewrite; this is the
