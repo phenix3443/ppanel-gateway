@@ -19,8 +19,23 @@ publish gateway source; this repo is the owner's compatible reimplementation.
 - `reconstructed/` builds, vets, and tests clean, but is a **contract skeleton**:
   the update pipeline and child-process supervision are stubbed (their function
   bodies were not decompiled — see the `[U]` section of the report).
-- The greenfield redesign plan lives separately in
-  `obsidian/ppanel/engineering-log/gateway-build-plan.md`.
+
+## Who needs this
+
+Only the all-in-one `ppanel` runtime image, where one container runs the server
+and both web apps behind the gateway. **The k3s and Docker Compose deployments
+do not run a gateway at all**: each repo ships its own image, and the three
+things the gateway does are covered by the platform instead.
+
+| Gateway role | Replaced by |
+|---|---|
+| Prefix reverse proxy (`core/proxy`) | Ingress rules (k3s) / published ports (compose) |
+| Child-process supervisor (`core/process`, `module.Manager`) | Kubernetes Deployments / compose services |
+| GitHub-release self-update (`/basic/check/version`, `/basic/update`) | Image tags + Flux image automation |
+
+Neither `ppanel-server` nor `ppanel-frontend` calls `/basic/*` any more (the admin
+version card has a test asserting it makes no gateway calls). Finish
+`reconstructed/` only if the all-in-one image is ever needed again.
 
 ## Quick start
 
