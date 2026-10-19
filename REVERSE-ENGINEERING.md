@@ -193,25 +193,42 @@ observed original to stay compatible with.
 
 ## Verification results
 
-Run in the analysis environment (Go 1.26.8, `reconstructed/` module, go 1.24):
+Run in the analysis environment (`reconstructed/` module):
 
 ```
 gofmt -l .      -> (empty; all formatted)
 go build ./...  -> ok (no output)
 go vet ./...    -> ok (no output)
-go test ./...   -> ok  core/proxy, core/utils
-                   (cmd, handler, handler/basic, module, types: no test files)
+go test ./...   -> ok  core/archive, core/github, core/process, core/proxy,
+                       core/utils, internal/handler/basic, internal/module
 ```
 
-Remaining gaps (match the `[U]` list above; all surface as explicit stubs that
-return errors / `501`, never as fabricated success):
+Unit/integration coverage: GitHub release lookup + 30m cache + asset selection
+(`core/github`), tar.gz extraction + path-traversal rejection (`core/archive`),
+child start/stop/restart (`core/process`), the full update pipeline — install +
+spawn, no-op when current, `.bak` swap on upgrade — and heartbeat
+mark-unhealthy-after-5-failures (`internal/module`), and the control-plane
+contract incl. secret auth 401 / unknown-module 404 (`internal/handler/basic`).
 
-- `module.UpdateModule`, `module.QueryLastestVersion` — error stubs.
-- `handler/basic.UpdateServiceHandler` — returns `501 Not Implemented`.
-- `handler/basic.CheckServiceVersionHandler` — reports current version only;
-  `latest_version` is empty (GitHub lookup not reconstructed).
-- Child-process supervision (`core/process`, `module.Start/Restart/Rollback`)
-  not implemented.
+### Differential test vs the shipped binary (2026-10-19)
+
+`test/observe-original.sh` boots the shipped binary and `test/observe-reconstructed.sh`
+boots the from-source gateway (`go build ./cmd/gateway`), both in an isolated
+sandbox. The reconstruction reproduces the shipped binary's observed behavior:
+boot → query GitHub (`perfect-panel/server`, `v1.20.3`) → download the
+`ppanel-server-linux-amd64.tar.gz` asset → extract to `modules/ppanel-server`
+→ spawn it as a child (`run`; the real Hertz server comes up on `127.0.0.1:8080`)
+→ serve the control plane. Observed control-plane parity: `GET /basic/heartbeat`
+with the right secret → `{"alive":true}`, wrong secret → `401`, unknown module
+→ `404`; `GET /basic/check/version` → current/latest/update_needed computed from
+the GitHub release. `SIGTERM` stops the child and shuts down cleanly.
+
+**Status: the reconstruction is a functional, from-source, behavior-compatible
+replacement** for the control plane + updater + reverse-proxy + supervisor. The
+remaining `[U]`-adjacent details that do not affect external behavior (exact
+log strings, the precise go-zero/chi middleware ordering, the on-wire shape of
+the service→gateway registration handshake body) are intentionally not
+byte-matched; they are documented as inference where they appear.
 
 ## Function-level decompilation (Ghidra 12.1.4 via rea)
 
@@ -248,11 +265,56 @@ Resolved from decompilation (these move `[U]`/`[I]` → `[E]`):
   sides on `"."`, and compares segment-by-segment — **validates the reconstruction**
   in `reconstructed/core/utils/version.go`.
 
-Still `[U]` after decompilation:
+## 2026-10-19 — `[U]` closure (deeper decompilation + live runtime observation)
 
-- Exact `service_name` → GitHub repo mapping (asset keyword is now known; the
-  repo/owner selection per service was not traced end-to-end).
-- On-disk persisted registry/update-history format.
-- Heartbeat passive-vs-active semantics.
-- `version.lock` acquisition/release details (file is referenced; locking flow
-  not traced).
+A second rea/Ghidra pass decompiled the logic/handler/update bodies, and the
+binary was then **booted in an isolated sandbox** (`test/observe-original.sh`,
+minimal `etc/ppanel.yaml` + `GATEWAY_*`/`SECRET_KEY` env) and observed live.
+Every previously-residual `[U]` is now `[E]`:
+
+- **`service_name` → repo = the `repository` field supplied at registration.**
+  `parseRepoURL` (`0x7a0de0`) strips a trailing `/` and splits the repo URL path,
+  requiring ≥2 segments (`owner/repo`). Not hardcoded per service.
+- **Registry is in-memory, not persisted.** `RegisterModule` (`0x7ebb00`) stores
+  into a map and POSTs a JSON handshake back to the service; no file writes.
+  Live run wrote no registry file to the sandbox. (`version.lock` is the update
+  mutex file, used only during an update.)
+- **Heartbeat is BOTH active and passive.** `Manager.Heartbeat` (`0x7e8540`) is a
+  scheduler job (observed interval **1m**) that issues an HTTP `GET` to each
+  module's `heartbeat_url` (per-request client timeouts ~3s/30s seen in code) and
+  marks a module unhealthy (`flag@+0xc0 = 0`) after **>5** consecutive failures.
+  The `/basic/heartbeat` endpoint (`HeartbeatLogic`, `0x7eddc0`) is the passive
+  reader: it validates `service_name`+`secret` and returns that health flag.
+- **Auth:** register/heartbeat/check/update each compare the request `secret`
+  against the module's stored secret (401/`0x191` on mismatch, 404/`0x194` if the
+  module is unknown).
+- **Latest-version lookup is GitHub, cached 30 min.** `QueryLastestVersion`
+  (`0x7e8da0`) returns the cached version when the cache age `< 1.8e12 ns` (1800s);
+  otherwise it builds a GitHub client and fetches the latest release, caching the
+  version + timestamp. `GetSystemAssetURL` (`0x7a1080`) picks the release asset
+  whose name contains `linux-amd64`.
+- **Update pipeline** (`UpdateService` `0x7ee560`): version-gate via
+  `CompareVersion`; only acts when current < latest; then **dispatches by module
+  type** — `static` → `FUN_007ea340` (download + extract web bundle); `service` →
+  `FUN_007eb360` (download binary) then `UpdateModule`.
+- **`UpdateModule`** (`0x7e67e0`): acquires the lock, **stops the running child
+  process**, `rename(current → current.bak)`, `rename(new → current)`, then
+  **restarts the child**; on failure rolls back from `.bak` and restarts. So the
+  backend IS auto-restarted by the gateway itself.
+
+**Live-observed boot behavior (sandbox, 2026-10-19):** on start the gateway
+initialized a scheduler, found a default module `ppanel-server` (baseline current
+`v0.0.1`), queried GitHub (`perfect-panel/server`, latest `v1.20.3`), downloaded
+`ppanel-server-linux-amd64.tar.gz`, extracted to `modules/ppanel-server`, spawned
+it as a child (`modules/ppanel-server run`, Hertz server on `127.0.0.1:8080`),
+started the HTTP route service on `0.0.0.0:<Port>` proxying `/*` to the module,
+and registered the heartbeat cron at `1m`. Minimal config that boots:
+`Name/Host/Port/Mode` in `etc/ppanel.yaml`.
+
+**Deployment role:** the gateway is the **ENTRYPOINT of the upstream all-in-one
+`ppanel` container image** (`ppanel/Dockerfile`: `ENTRYPOINT ["/app/gateway"]`,
+bundling gateway + `modules/ppanel-server` + `etc/ppanel.yaml`). It supervises,
+updates and reverse-proxies the server inside one container. The current k8s
+deployment does **not** use it (server/web run as separate from-source
+Deployments), so a reconstructed gateway targets the all-in-one image path, not
+the live cluster.

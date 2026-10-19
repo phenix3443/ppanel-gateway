@@ -4,3 +4,6 @@
 # local analysis scratch
 *.snapshot
 *.snapshot.*
+
+# runtime observation scratch (differential test outputs)
+/test/observed/

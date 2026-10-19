@@ -50,6 +50,7 @@ type ServiceVersionResponse struct {
 // UpdateServiceRequest triggers an update of a registered service to a target
 // (or latest) version.
 type UpdateServiceRequest struct {
+	Secret      string `json:"secret"`
 	ServiceName string `json:"service_name"`
 	Version     string `json:"version,omitempty"` // [I] optional target; empty => latest
 }

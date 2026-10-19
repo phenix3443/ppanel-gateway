@@ -1,23 +1,43 @@
 // RECONSTRUCTION — not original source. See ../../REVERSE-ENGINEERING.md.
 //
-// Mirrors updater/internal/module. Symbols [E]: Manager.{FindModule,
-// RegisterModule, RemoveModule, Heartbeat, GetModuleHealth, UpdateInfo,
-// QueryLastestVersion, Start, Stop, Restart, Rollback, RunBinary,
-// UpdateModule}, NewManager, FreePort. The in-memory registry below [I] covers
-// the registry/health/version-tracking surface. Process supervision and update
-// application ([U] unrecovered bodies) are left as explicit TODO stubs rather
-// than invented behavior.
+// Mirrors updater/internal/module. This file now implements the behavior that
+// the 2026-10-19 decompilation + live run established as [E]:
+//   - in-memory registry keyed by service_name (no on-disk registry)
+//   - QueryLatestVersion with a 30-minute cache (via core/github)
+//   - active heartbeat poller: GET each module's heartbeat_url, mark unhealthy
+//     after >5 consecutive failures
+//   - UpdateModule: version.lock -> stop child -> rename current->.bak ->
+//     move new->current -> restart child -> rollback from .bak on failure
+//
+// The static-vs-service dispatch matches UpdateService (0x7ee560).
 package module
 
 import (
+	"context"
 	"fmt"
 	"net"
+	"net/http"
+	"os"
+	"path/filepath"
 	"sync"
 	"time"
+
+	"ppanel-gateway/reconstructed/core/archive"
+	"ppanel-gateway/reconstructed/core/process"
+	"ppanel-gateway/reconstructed/core/utils"
 )
 
-// Info is the stored record for one registered service. Fields correspond to
-// the registration payload [E].
+// Module kinds. [E] UpdateService (0x7ee560) branches on "static" vs "service".
+const (
+	KindService = "service"
+	KindStatic  = "static"
+)
+
+// maxHeartbeatFailures is the consecutive-failure threshold before a module is
+// marked unhealthy. [E] 0x7e8540 compares the counter against 5 (">5").
+const maxHeartbeatFailures = 5
+
+// Info is the stored record for one registered service.
 type Info struct {
 	ServiceName    string
 	ServiceURL     string
@@ -25,36 +45,66 @@ type Info struct {
 	HeartbeatURL   string
 	Repository     string
 	ServiceVersion string
+	Secret         string
+	Kind           string // KindService | KindStatic
 	LastHeartbeat  time.Time
+	Healthy        bool
+
+	failCount int
 }
 
-// Health is the reported liveness of a module. [I] shape.
-type Health struct {
-	ServiceName string
-	Alive       bool
-	LastSeen    time.Time
+// releaseSource is the GitHub-facing capability UpdateModule needs; core/github
+// satisfies it, and tests inject a fake.
+type releaseSource interface {
+	LatestVersion(ctx context.Context, repoURL string) (string, error)
+	SystemAssetURL(ctx context.Context, repoURL, tag string) (string, error)
+	Download(ctx context.Context, url, dest string) error
 }
 
 // Manager is the service registry + lifecycle controller.
 type Manager struct {
-	mu      sync.RWMutex
-	modules map[string]*Info // keyed by service_name [I]
+	mu       sync.RWMutex
+	modules  map[string]*Info
+	sups     map[string]*process.Supervisor
+	releases releaseSource
+	workDir  string // holds modules/<name> and version.lock
+	client   *http.Client
 }
 
-// NewManager constructs an empty registry. [E] symbol NewManager.
-func NewManager() *Manager {
-	return &Manager{modules: make(map[string]*Info)}
+// NewManager constructs an empty registry rooted at workDir.
+func NewManager(workDir string, releases releaseSource) *Manager {
+	return &Manager{
+		modules:  make(map[string]*Info),
+		sups:     make(map[string]*process.Supervisor),
+		releases: releases,
+		workDir:  workDir,
+		client:   &http.Client{Timeout: 30 * time.Second},
+	}
 }
 
-// RegisterModule records (or replaces) a module registration. [E] symbol.
+func normalizeVersion(v string) string {
+	if v != "" && v[0] != 'v' {
+		return "v" + v
+	}
+	return v
+}
+
+// RegisterModule records (or replaces) a module registration. [E] the version
+// is normalized with a leading "v" and the module starts healthy.
 func (m *Manager) RegisterModule(info *Info) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
+	info.ServiceVersion = normalizeVersion(info.ServiceVersion)
+	if info.Kind == "" {
+		info.Kind = KindService
+	}
 	info.LastHeartbeat = time.Now()
+	info.Healthy = true
+	info.failCount = 0
 	m.modules[info.ServiceName] = info
 }
 
-// FindModule looks up a module by service_name. [E] symbol Manager.FindModule.
+// FindModule looks up a module by service_name.
 func (m *Manager) FindModule(name string) (*Info, bool) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
@@ -62,61 +112,302 @@ func (m *Manager) FindModule(name string) (*Info, bool) {
 	return info, ok
 }
 
-// RemoveModule drops a registration. [E] symbol Manager.RemoveModule.
+// RemoveModule drops a registration.
 func (m *Manager) RemoveModule(name string) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	delete(m.modules, name)
 }
 
-// Heartbeat records a liveness ping for a module. [E] symbol Manager.Heartbeat.
-func (m *Manager) Heartbeat(name string) error {
+// Authorized reports whether secret matches the module's stored secret. [E]
+// register/heartbeat/check/update all validate the request secret (401 on
+// mismatch); a module with no secret accepts any.
+func (m *Manager) Authorized(name, secret string) (ok, exists bool) {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	info, found := m.modules[name]
+	if !found {
+		return false, false
+	}
+	if info.Secret == "" {
+		return true, true
+	}
+	return info.Secret == secret, true
+}
+
+// IsHealthy returns a module's current health flag (set by the active poller).
+// This is what the /basic/heartbeat endpoint reports. [E] 0x7eddc0.
+func (m *Manager) IsHealthy(name string) (healthy, exists bool) {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	info, found := m.modules[name]
+	if !found {
+		return false, false
+	}
+	return info.Healthy, true
+}
+
+// QueryLatestVersion returns the latest release version for the module's repo
+// (30-minute cache lives in the release source). [E] 0x7e8da0.
+func (m *Manager) QueryLatestVersion(ctx context.Context, name string) (string, error) {
+	info, ok := m.FindModule(name)
+	if !ok {
+		return "", fmt.Errorf("module %q not registered", name)
+	}
+	if info.Repository == "" {
+		return "", fmt.Errorf("module %q has no repository", name)
+	}
+	return m.releases.LatestVersion(ctx, info.Repository)
+}
+
+// CheckVersion reports the current and latest versions and whether an update is
+// due (current < latest). [E] CheckServiceVersion (0x7eda40) uses CompareVersion.
+func (m *Manager) CheckVersion(ctx context.Context, name string) (current, latest string, updateNeeded bool, err error) {
+	info, ok := m.FindModule(name)
+	if !ok {
+		return "", "", false, fmt.Errorf("module %q not registered", name)
+	}
+	latest, err = m.QueryLatestVersion(ctx, name)
+	if err != nil {
+		return info.ServiceVersion, "", false, err
+	}
+	return info.ServiceVersion, latest, utils.CompareVersion(info.ServiceVersion, latest) < 0, nil
+}
+
+// lockPath is the update mutex file. [E] contract token "version.lock".
+func (m *Manager) lockPath() string { return filepath.Join(m.workDir, "version.lock") }
+
+func (m *Manager) acquireLock() (release func(), err error) {
+	p := m.lockPath()
+	f, err := os.OpenFile(p, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0o644)
+	if err != nil {
+		return nil, fmt.Errorf("update already in progress (version.lock held): %w", err)
+	}
+	_ = f.Close()
+	return func() { _ = os.Remove(p) }, nil
+}
+
+// supervisor returns (creating if needed) the child supervisor for a service
+// module whose binary is modules/<name>.
+func (m *Manager) supervisor(name string) *process.Supervisor {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	info, ok := m.modules[name]
+	if s, ok := m.sups[name]; ok {
+		return s
+	}
+	bin := filepath.Join(m.workDir, "modules", name)
+	s := process.New(bin, "run")
+	m.sups[name] = s
+	return s
+}
+
+// UpdateModule applies an update for the named module. [E] UpdateService
+// (0x7ee560) + UpdateModule (0x7e67e0): version-gate, then for a service module
+// download the asset, stop the child, rename current->.bak, move new->current,
+// restart, and roll back from .bak on failure. A static module extracts the
+// bundle in place.
+func (m *Manager) UpdateModule(ctx context.Context, name string) error {
+	info, ok := m.FindModule(name)
 	if !ok {
 		return fmt.Errorf("module %q not registered", name)
 	}
-	info.LastHeartbeat = time.Now()
+	latest, err := m.QueryLatestVersion(ctx, name)
+	if err != nil {
+		return fmt.Errorf("query latest: %w", err)
+	}
+	if utils.CompareVersion(info.ServiceVersion, latest) >= 0 {
+		return nil // already up to date
+	}
+
+	release, err := m.acquireLock()
+	if err != nil {
+		return err
+	}
+	defer release()
+
+	assetURL, err := m.releases.SystemAssetURL(ctx, info.Repository, latest)
+	if err != nil {
+		return fmt.Errorf("select asset: %w", err)
+	}
+
+	modDir := filepath.Join(m.workDir, "modules")
+	if err := os.MkdirAll(modDir, 0o755); err != nil {
+		return err
+	}
+	tarball := filepath.Join(modDir, name+".download.tar.gz")
+	if err := m.releases.Download(ctx, assetURL, tarball); err != nil {
+		return fmt.Errorf("download: %w", err)
+	}
+	defer func() { _ = os.Remove(tarball) }()
+
+	switch info.Kind {
+	case KindStatic:
+		// Static web bundle: extract in place into modules/<name>.
+		dest := filepath.Join(modDir, name)
+		if err := archive.ExtractTarGz(tarball, dest); err != nil {
+			return fmt.Errorf("extract static: %w", err)
+		}
+	default: // KindService
+		if err := m.updateServiceBinary(ctx, name, tarball); err != nil {
+			return err
+		}
+	}
+
+	m.mu.Lock()
+	info.ServiceVersion = normalizeVersion(latest)
+	m.mu.Unlock()
 	return nil
 }
 
-// GetModuleHealth reports health for a module. [E] symbol Manager.GetModuleHealth.
-// Note: the original binary spells the latest-version method "QueryLastestVersion"
-// (sic); the typo is preserved below to document the real symbol.
-func (m *Manager) GetModuleHealth(name string, staleAfter time.Duration) (Health, bool) {
-	m.mu.RLock()
-	defer m.mu.RUnlock()
-	info, ok := m.modules[name]
-	if !ok {
-		return Health{}, false
+// updateServiceBinary performs the stop -> .bak swap -> move -> restart ->
+// rollback sequence for a service module. [E] 0x7e67e0.
+func (m *Manager) updateServiceBinary(ctx context.Context, name, tarball string) error {
+	modDir := filepath.Join(m.workDir, "modules")
+	staging := filepath.Join(modDir, name+".new.d")
+	_ = os.RemoveAll(staging)
+	if err := archive.ExtractTarGz(tarball, staging); err != nil {
+		return fmt.Errorf("extract service: %w", err)
 	}
-	return Health{
-		ServiceName: name,
-		Alive:       time.Since(info.LastHeartbeat) <= staleAfter,
-		LastSeen:    info.LastHeartbeat,
-	}, true
+	defer func() { _ = os.RemoveAll(staging) }()
+
+	newBin, err := findBinary(staging, name)
+	if err != nil {
+		return err
+	}
+	current := filepath.Join(modDir, name)
+	backup := current + ".bak"
+
+	sup := m.supervisor(name)
+	_ = sup.Stop() // [E] stop the child before swapping
+
+	// rename(current -> current.bak) when a current binary exists.
+	if _, statErr := os.Stat(current); statErr == nil {
+		if err := os.Rename(current, backup); err != nil {
+			_ = sup.Start()
+			return fmt.Errorf("backup current: %w", err)
+		}
+	}
+	// move new -> current; on failure roll back from .bak and restart.
+	if err := os.Rename(newBin, current); err != nil {
+		if _, bErr := os.Stat(backup); bErr == nil {
+			_ = os.Rename(backup, current)
+		}
+		_ = sup.Start()
+		return fmt.Errorf("install new: %w", err)
+	}
+	_ = os.Chmod(current, 0o755)
+	if err := sup.Start(); err != nil {
+		// restart failed: roll back and try to restart the previous binary.
+		if _, bErr := os.Stat(backup); bErr == nil {
+			_ = os.Remove(current)
+			_ = os.Rename(backup, current)
+			_ = sup.Start()
+		}
+		return fmt.Errorf("restart after update: %w", err)
+	}
+	return nil
 }
 
-// QueryLastestVersion (sic — matches binary symbol) would query the module's
-// GitHub repository for the latest release. [U] body unrecovered.
-func (m *Manager) QueryLastestVersion(name string) (string, error) {
-	return "", fmt.Errorf("QueryLastestVersion: not reconstructed (requires GitHub release lookup; see REVERSE-ENGINEERING.md [U])")
+// findBinary locates the service executable inside an extracted staging dir:
+// first a top-level file named exactly name, else the first regular file.
+func findBinary(staging, name string) (string, error) {
+	direct := filepath.Join(staging, name)
+	if st, err := os.Stat(direct); err == nil && !st.IsDir() {
+		return direct, nil
+	}
+	var found string
+	err := filepath.WalkDir(staging, func(p string, d os.DirEntry, err error) error {
+		if err != nil || found != "" || d.IsDir() {
+			return err
+		}
+		if filepath.Base(p) == name {
+			found = p
+		}
+		return nil
+	})
+	if err != nil {
+		return "", err
+	}
+	if found == "" {
+		return "", fmt.Errorf("no binary %q found in release archive", name)
+	}
+	return found, nil
 }
 
-// UpdateModule downloads and applies an update for the named service.
-// [E] decompilation (updater/internal/module.(*Manager).UpdateModule @0x7e67e0)
-// shows a ".bak" backup-and-swap: the existing artifact is moved aside to
-// "<path>.bak" before the new one is installed, which is what enables Rollback.
-// The download/extract half ([U]) is not reconstructed, so this returns an
-// error rather than faking a successful install.
-func (m *Manager) UpdateModule(name, version string) error {
-	return fmt.Errorf("UpdateModule: backup-and-swap via .bak is evidenced, but the download/extract pipeline is not reconstructed (see REVERSE-ENGINEERING.md [U])")
+// StartHeartbeatLoop polls every module's heartbeat_url on the given interval
+// until ctx is cancelled. [E] 0x7e8540: GET heartbeat_url, mark unhealthy after
+// >maxHeartbeatFailures consecutive failures; the live scheduler interval is 1m.
+func (m *Manager) StartHeartbeatLoop(ctx context.Context, interval time.Duration) {
+	t := time.NewTicker(interval)
+	go func() {
+		defer t.Stop()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-t.C:
+				m.pollOnce(ctx)
+			}
+		}
+	}()
 }
 
-// backupSuffix is the suffix used when moving the current artifact aside before
-// installing an update. [E] — ".bak" referenced by UpdateModule.
-const backupSuffix = ".bak"
+func (m *Manager) pollOnce(ctx context.Context) {
+	m.mu.RLock()
+	targets := make([]*Info, 0, len(m.modules))
+	for _, info := range m.modules {
+		if info.HeartbeatURL != "" {
+			targets = append(targets, info)
+		}
+	}
+	m.mu.RUnlock()
+
+	for _, info := range targets {
+		ok := m.probe(ctx, info.HeartbeatURL)
+		m.mu.Lock()
+		if ok {
+			info.failCount = 0
+			info.Healthy = true
+			info.LastHeartbeat = time.Now()
+		} else {
+			info.failCount++
+			if info.failCount > maxHeartbeatFailures {
+				info.Healthy = false
+			}
+		}
+		m.mu.Unlock()
+	}
+}
+
+func (m *Manager) probe(ctx context.Context, url string) bool {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return false
+	}
+	resp, err := m.client.Do(req)
+	if err != nil {
+		return false
+	}
+	_ = resp.Body.Close()
+	return resp.StatusCode < http.StatusInternalServerError
+}
+
+// Shutdown stops every supervised child process. [E] the original stops its
+// module children on SIGTERM ("Got signal 15, shutting down").
+func (m *Manager) Shutdown() {
+	m.mu.Lock()
+	sups := make([]*process.Supervisor, 0, len(m.sups))
+	for _, s := range m.sups {
+		sups = append(sups, s)
+	}
+	m.mu.Unlock()
+	for _, s := range sups {
+		_ = s.Stop()
+	}
+}
+
+// FreePort returns an available TCP port.
+func (m *Manager) FreePort() (int, error) { return FreePort() }
 
 // FreePort returns an available TCP port. [E] symbol FreePort.
 func FreePort() (int, error) {
@@ -124,6 +415,6 @@ func FreePort() (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	defer l.Close()
+	defer func() { _ = l.Close() }()
 	return l.Addr().(*net.TCPAddr).Port, nil
 }
