@@ -1,33 +1,52 @@
 # ppanel-gateway
 
-Self-hosted replacement for the closed-source `gateway` binary that ships
-(binary-only) inside the `ppanel` runtime. Upstream `perfect-panel` does not
-publish gateway source; this repo is the owner's compatible reimplementation.
+A from-source, behavior-compatible implementation of the ppanel all-in-one
+container's `gateway` entrypoint: a supervisor that, for each configured module,
+checks its latest GitHub release, downloads and extracts the platform asset,
+runs the module as a child process, reverse-proxies incoming requests to it, and
+polls its heartbeat.
 
-## Contents
+## Layout
 
-| Path | What it is |
-|---|---|
-| `REVERSE-ENGINEERING.md` | Static analysis of the shipped gateway binary, with evidence levels (evidenced / inferred / unrecovered). |
-| `analysis/` | Raw analysis artifacts + a re-runnable `reproduce.sh` (static only; never executes the binary). |
-| `reconstructed/` | A compilable Go skeleton that mirrors the recovered package layout and implements the **observed** HTTP contract. **Not original source** — a from-the-outside reimplementation. |
+```
+cmd/gateway      main — loads etc/ppanel.yaml, wires everything, serves
+internal/
+  config         YAML config load + env overrides + module bootstrap
+  github         GitHub release lookup, asset selection, download (30m cache)
+  archive        tar.gz extraction with path-traversal guards
+  process        child-process supervisor (start/stop/restart)
+  proxy          longest-prefix reverse-proxy router
+  module         service registry + heartbeat poller + update pipeline
+  server         control-plane HTTP API (/basic/*) + proxy + static hosting
+  version        dotted numeric version comparison
+test/            differential-test harnesses vs the original binary
+```
 
-## Status
-
-- Structure (packages, functions, types, routes, env, GitHub release flow) is
-  recovered and documented.
-- `reconstructed/` builds, vets, and tests clean, but is a **contract skeleton**:
-  the update pipeline and child-process supervision are stubbed (their function
-  bodies were not decompiled — see the `[U]` section of the report).
-- The greenfield redesign plan lives separately in
-  `obsidian/ppanel/engineering-log/gateway-build-plan.md`.
-
-## Quick start
+## Build & test
 
 ```sh
-# Re-run the binary analysis (needs the gateway binary from the ppanel runtime repo):
-./analysis/reproduce.sh /abs/path/to/ppanel/bin/gateway-linux-amd64
+go build ./...
+go test ./...
 
-# Build & test the reconstruction:
-cd reconstructed && go build ./... && go test ./...
+# cross-compile a release binary (CGO disabled, stripped)
+GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" ./cmd/gateway
 ```
+
+## Control plane
+
+| Method | Path                    | Purpose                                 |
+|--------|-------------------------|-----------------------------------------|
+| POST   | `/basic/register`       | a module announces itself               |
+| GET    | `/basic/heartbeat`      | report a module's current health flag   |
+| GET    | `/basic/check/version`  | current vs latest release               |
+| POST   | `/basic/update`         | run the update pipeline for a module    |
+
+Each endpoint validates the module's `secret` (401 on mismatch, 404 if unknown).
+Public `/api` and `/sub` traffic is reverse-proxied to registered upstreams;
+`/admin` and `/` are served from `static/`.
+
+## Configuration
+
+`etc/ppanel.yaml` (`-f` to override). Minimal boot needs `Name`/`Host`/`Port`/
+`Mode`; `Modules` declares supervised services. Env overrides: `GATEWAY_PORT`,
+`GATEWAY_MODE`, `SECRET_KEY`, `GATEWAY_WORKDIR`.
